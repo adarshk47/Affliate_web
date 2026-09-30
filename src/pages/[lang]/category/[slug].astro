@@ -1,0 +1,25 @@
+---
+import Base from '../../../layouts/Base.astro';
+import ProductGrid from '../../../components/ProductGrid.astro';
+import AdSlot from '../../../components/AdSlot.astro';
+import { SITE } from '../../../site.config.mjs';
+import { UI } from '../../../i18n/ui.mjs';
+import { products, categories, url } from '../../../lib/data.mjs';
+import { getGuides } from '../../../lib/guides.mjs';
+export function getStaticPaths() {
+  return SITE.languages.flatMap((lang) => categories.map((c) => ({ params: { lang, slug: c.slug } })));
+}
+const { lang, slug } = Astro.params;
+const t = UI[lang];
+const cat = categories.find((c) => c.slug === slug);
+const list = products.filter((p) => p.category === slug);
+const guides = getGuides(lang).filter((g) => g.category === slug);
+---
+<Base lang={lang} title={cat.name[lang]} path={`/category/${slug}/`}>
+  <h1>{cat.icon} {cat.name[lang]}</h1>
+  {guides.length > 0 && (
+    <p>{t.guides}: {guides.map((g, i) => <>{i > 0 && ' · '}<a href={url(`/${lang}/guides/${g.slug}/`)}>{g.title}</a></>)}</p>
+  )}
+  <AdSlot />
+  <ProductGrid products={list} lang={lang} />
+</Base>

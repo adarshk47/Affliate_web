@@ -1,0 +1,18 @@
+---
+import { url } from '../lib/data.mjs';
+const target = url('/en/');
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="refresh" content={`0; url=${target}`} />
+  <link rel="canonical" href={target} />
+  <title>DealDesi</title>
+  <script is:inline define:vars={{ target }}>
+    const l = (navigator.language || '').toLowerCase();
+    location.replace(l.startsWith('hi') ? target.replace(/en\/$/, 'hi/') : target);
+  </script>
+</head>
+<body><a href={target}>Continue</a></body>
+</html>

@@ -1,0 +1,18 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { UI } from '../../../i18n/ui.mjs';
+import { url, langPaths } from '../../../lib/data.mjs';
+import { getGuides } from '../../../lib/guides.mjs';
+export const getStaticPaths = langPaths;
+const { lang } = Astro.params;
+const t = UI[lang];
+const guides = getGuides(lang);
+---
+<Base lang={lang} title={t.guides} path="/guides/">
+  <h1>{t.guides}</h1>
+  <div class="guide-list">
+    {guides.map((g) => (
+      <a class="tile" href={url(`/${lang}/guides/${g.slug}/`)}><strong>{g.title}</strong><div class="small">{g.description}</div></a>
+    ))}
+  </div>
+</Base>

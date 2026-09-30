@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../site.config.mjs';
+import { INFO_PAGES } from '../../i18n/pages.mjs';
+export function getStaticPaths() {
+  return SITE.languages.flatMap((lang) => Object.keys(INFO_PAGES).map((page) => ({ params: { lang, page } })));
+}
+const { lang, page } = Astro.params;
+const { title, body } = INFO_PAGES[page][lang];
+---
+<Base lang={lang} title={title} path={`/${page}/`}>
+  <article class="prose">
+    <h1>{title}</h1>
+    <Fragment set:html={body} />
+  </article>
+</Base>

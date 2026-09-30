@@ -1,0 +1,57 @@
+---
+import ProductCard from './ProductCard.astro';
+import { STORES } from '../site.config.mjs';
+import { UI } from '../i18n/ui.mjs';
+interface Props { products: any[]; lang: string; filters?: boolean; }
+const { products, lang, filters = true } = Astro.props;
+const t = UI[lang];
+const storesInList = [...new Set(products.map((p) => p.store))];
+---
+<section class="grid-wrap" data-grid>
+  {filters && (
+    <div class="filters">
+      <input type="search" placeholder={t.search} data-f="q" aria-label={t.search} />
+      <select data-f="store" aria-label={t.allStores}>
+        <option value="">{t.allStores}</option>
+        {storesInList.map((s) => <option value={s}>{STORES[s]?.name || s}</option>)}
+      </select>
+      <select data-f="max" aria-label={t.maxPrice}>
+        <option value="">{t.maxPrice}</option>
+        {[500, 1000, 2000, 5000, 10000, 20000].map((n) => <option value={n}>≤ ₹{n.toLocaleString('en-IN')}</option>)}
+      </select>
+      <select data-f="sort" aria-label="Sort">
+        <option value="new">{t.sortNew}</option>
+        <option value="discount">{t.sortDiscount}</option>
+        <option value="price">{t.sortPriceLow}</option>
+      </select>
+    </div>
+  )}
+  <div class="grid" data-list>
+    {products.map((p) => <ProductCard product={p} lang={lang} />)}
+  </div>
+  <p class="empty" data-empty hidden>{t.noResults}</p>
+</section>
+
+<script>
+  document.querySelectorAll('[data-grid]').forEach((root) => {
+    const list = root.querySelector('[data-list]');
+    const cards = [...list.children];
+    const get = (k) => root.querySelector(`[data-f="${k}"]`)?.value || '';
+    const apply = () => {
+      const q = get('q').toLowerCase().trim(), store = get('store'), max = Number(get('max')) || Infinity, sort = get('sort') || 'new';
+      let shown = 0;
+      const sorted = [...cards].sort((a, b) => {
+        if (sort === 'discount') return b.dataset.discount - a.dataset.discount;
+        if (sort === 'price') return (Number(a.dataset.price) || 1e12) - (Number(b.dataset.price) || 1e12);
+        return b.dataset.added.localeCompare(a.dataset.added);
+      });
+      for (const c of sorted) {
+        const ok = (!q || c.dataset.title.includes(q)) && (!store || c.dataset.store === store) && (!c.dataset.price || Number(c.dataset.price) <= max);
+        c.hidden = !ok; if (ok) shown++;
+        list.appendChild(c);
+      }
+      root.querySelector('[data-empty]').hidden = shown > 0;
+    };
+    root.querySelectorAll('[data-f]').forEach((el) => el.addEventListener('input', apply));
+  });
+</script>

@@ -1,0 +1,7 @@
+[
+  { "slug": "electronics", "icon": "📱", "name": { "en": "Mobiles & Electronics", "hi": "मोबाइल और इलेक्ट्रॉनिक्स", "hinglish": "Mobile aur Electronics" } },
+  { "slug": "fashion", "icon": "👗", "name": { "en": "Fashion", "hi": "फ़ैशन", "hinglish": "Fashion" } },
+  { "slug": "home-kitchen", "icon": "🍳", "name": { "en": "Home & Kitchen", "hi": "घर और रसोई", "hinglish": "Ghar aur Kitchen" } },
+  { "slug": "beauty", "icon": "💄", "name": { "en": "Beauty & Personal Care", "hi": "ब्यूटी और पर्सनल केयर", "hinglish": "Beauty aur Personal Care" } },
+  { "slug": "baby-kids", "icon": "🧸", "name": { "en": "Baby & Kids", "hi": "बेबी और किड्स", "hinglish": "Baby aur Kids" } }
+]

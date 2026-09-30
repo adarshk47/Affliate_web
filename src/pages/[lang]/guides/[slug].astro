@@ -1,0 +1,28 @@
+---
+import Base from '../../../layouts/Base.astro';
+import ProductGrid from '../../../components/ProductGrid.astro';
+import AdSlot from '../../../components/AdSlot.astro';
+import { SITE } from '../../../site.config.mjs';
+import { UI } from '../../../i18n/ui.mjs';
+import { products } from '../../../lib/data.mjs';
+import { getGuides } from '../../../lib/guides.mjs';
+export function getStaticPaths() {
+  return SITE.languages.flatMap((lang) => getGuides(lang).map((g) => ({ params: { lang, slug: g.slug }, props: { guide: g } })));
+}
+const { lang } = Astro.params;
+const { guide } = Astro.props;
+const t = UI[lang];
+const { Content } = guide;
+const related = products
+  .filter((p) => p.category === guide.category && (!guide.maxPrice || !p.price || p.price <= guide.maxPrice))
+  .slice(0, 8);
+---
+<Base lang={lang} title={guide.title} description={guide.description} path={`/guides/${guide.slug}/`}>
+  <article class="prose">
+    <h1>{guide.title}</h1>
+    <p class="small">{t.disclosureShort}</p>
+    <Content />
+  </article>
+  <AdSlot />
+  {related.length > 0 && (<><h2>{t.latest}</h2><ProductGrid products={related} lang={lang} filters={false} /></>)}
+</Base>

@@ -1,0 +1,19 @@
+{
+  "name": "dealdesi",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "fetch": "node scripts/fetch-products.mjs",
+    "build": "astro build",
+    "preview": "astro preview",
+    "update": "npm run fetch && npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "astro": "^7.3.5"
+  }
+}

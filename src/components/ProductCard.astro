@@ -1,0 +1,27 @@
+---
+import { STORES } from '../site.config.mjs';
+import { UI } from '../i18n/ui.mjs';
+import { categories, formatINR } from '../lib/data.mjs';
+const { product: p, lang } = Astro.props;
+const t = UI[lang];
+const store = STORES[p.store] || { name: p.store, color: '#555' };
+const icon = categories.find((c) => c.slug === p.category)?.icon || '🛍️';
+const today = new Date().toISOString().slice(0, 10);
+---
+<article class="card" data-store={p.store} data-price={p.price ?? ''} data-discount={p.discount ?? 0} data-added={p.addedAt} data-title={p.title.toLowerCase()}>
+  <a class="card__img" href={p.link} target="_blank" rel="sponsored nofollow noopener">
+    {p.image ? <img src={p.image} alt={p.title} loading="lazy" referrerpolicy="no-referrer" /> : <span class="card__icon" aria-hidden="true">{icon}</span>}
+    {p.discount ? <span class="badge badge--off">{p.discount}% {t.off}</span> : null}
+    {p.addedAt === today ? <span class="badge badge--new">{t.newToday}</span> : null}
+  </a>
+  <div class="card__body">
+    <span class="store" style={`--store:${store.color}`}>{store.name}</span>
+    <h3 class="card__title">{p.title}</h3>
+    <div class="price">
+      {p.price ? <strong>{formatINR(p.price)}</strong> : null}
+      {p.mrp && p.mrp > p.price ? <s>{formatINR(p.mrp)}</s> : null}
+      {p.rating ? <span class="rating">★ {p.rating}</span> : null}
+    </div>
+    <a class="btn" href={p.link} target="_blank" rel="sponsored nofollow noopener" style={`--store:${store.color}`}>{t.buyOn} {store.name} →</a>
+  </div>
+</article>

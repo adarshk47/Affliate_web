@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProductGrid from '../../components/ProductGrid.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { UI } from '../../i18n/ui.mjs';
+import { products, updatedAt, langPaths } from '../../lib/data.mjs';
+export const getStaticPaths = langPaths;
+const { lang } = Astro.params;
+const t = UI[lang];
+---
+<Base lang={lang} title={t.deals} path="/deals/">
+  <h1>{t.deals}</h1>
+  <p class="small">{t.updated}: {new Date(updatedAt).toLocaleDateString('en-IN', { dateStyle: 'medium', timeZone: 'Asia/Kolkata' })} · {products.length} {t.productsIn}</p>
+  <AdSlot />
+  <ProductGrid products={products} lang={lang} />
+</Base>

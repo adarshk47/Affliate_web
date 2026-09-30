@@ -1,0 +1,138 @@
+---
+import { SITE } from '../site.config.mjs';
+import { UI, LANG_LABELS, HTML_LANG } from '../i18n/ui.mjs';
+import { categories, url, usingDemo } from '../lib/data.mjs';
+interface Props { lang: string; title?: string; description?: string; path?: string; }
+const { lang, title, description, path = '/' } = Astro.props;
+const t = UI[lang];
+const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} — ${SITE.tagline[lang]}`;
+const desc = description || SITE.tagline[lang];
+const abs = (l) => new URL(url(`/${l}${path}`), Astro.site).href;
+const adsenseClient = import.meta.env.PUBLIC_ADSENSE_CLIENT;
+---
+<!doctype html>
+<html lang={HTML_LANG[lang]}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={desc} />
+  <link rel="canonical" href={abs(lang)} />
+  {SITE.languages.map((l) => <link rel="alternate" hreflang={HTML_LANG[l]} href={abs(l)} />)}
+  <link rel="alternate" hreflang="x-default" href={abs(SITE.defaultLang)} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={desc} />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+  {adsenseClient && <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`} crossorigin="anonymous"></script>}
+</head>
+<body>
+  <header class="header">
+    <div class="container header__row">
+      <a class="logo" href={url(`/${lang}/`)}>🛍️ {SITE.name}</a>
+      <nav class="nav">
+        <a href={url(`/${lang}/deals/`)}>{t.deals}</a>
+        <a href={url(`/${lang}/guides/`)}>{t.guides}</a>
+      </nav>
+      <div class="langs">
+        {SITE.languages.map((l) => <a href={url(`/${l}${path}`)} class={l === lang ? 'active' : ''} hreflang={HTML_LANG[l]}>{LANG_LABELS[l]}</a>)}
+      </div>
+    </div>
+    <nav class="container cats">
+      {categories.map((c) => <a href={url(`/${lang}/category/${c.slug}/`)}>{c.icon} {c.name[lang]}</a>)}
+    </nav>
+  </header>
+
+  {usingDemo && <div class="demo">{t.demoBanner}</div>}
+
+  <main class="container">
+    <slot />
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="small">{t.disclosureShort} {t.priceNote}</p>
+      <nav class="footer__links">
+        <a href={url(`/${lang}/about/`)}>{t.about}</a>
+        <a href={url(`/${lang}/disclosure/`)}>{t.disclosure}</a>
+        <a href={url(`/${lang}/privacy/`)}>{t.privacy}</a>
+        <a href={url(`/${lang}/terms/`)}>{t.terms}</a>
+      </nav>
+      <p class="small">© {new Date().getFullYear()} {SITE.name}</p>
+    </div>
+  </footer>
+</body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #f6f7fb; --card: #fff; --text: #1b1f2a; --muted: #5f6675; --line: #e3e6ee;
+    --brand: #e8590c; --brand-ink: #fff; --good: #2b8a3e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #11141b; --card: #1a1f29; --text: #e8eaf0; --muted: #a0a7b5; --line: #2a303c; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Noto Sans Devanagari', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  a { color: inherit; }
+  img { max-width: 100%; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+  .small { font-size: 0.85rem; color: var(--muted); }
+
+  .header { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
+  .header__row { display: flex; align-items: center; gap: 16px; padding-top: 10px; padding-bottom: 10px; flex-wrap: wrap; }
+  .logo { font-weight: 800; font-size: 1.25rem; text-decoration: none; color: var(--brand); }
+  .nav { display: flex; gap: 16px; flex: 1; }
+  .nav a { text-decoration: none; font-weight: 600; }
+  .langs { display: flex; gap: 4px; }
+  .langs a { font-size: 0.8rem; text-decoration: none; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); }
+  .langs a.active { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+  .cats { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+  .cats a { white-space: nowrap; text-decoration: none; font-size: 0.9rem; padding: 6px 12px; background: var(--bg); border-radius: 999px; }
+
+  .demo { background: #fff3bf; color: #5c4400; text-align: center; padding: 8px 16px; font-size: 0.9rem; }
+  main { padding-top: 20px; padding-bottom: 40px; }
+  h1 { font-size: clamp(1.5rem, 4vw, 2.2rem); margin: 0.2em 0 0.4em; }
+  h2 { margin-top: 1.6em; }
+  .section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+
+  .hero { background: linear-gradient(135deg, #ff922b, #e8590c); color: #fff; border-radius: 16px; padding: 28px 24px; }
+  .hero p { margin: 0 0 16px; opacity: 0.95; }
+  .hero .btn { --store: #1b1f2a; display: inline-block; width: auto; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; text-decoration: none; }
+  .tile b { display: block; font-size: 1.6rem; }
+
+  .filters { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .filters input, .filters select { padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--text); font: inherit; min-width: 0; }
+  @media (max-width: 640px) { .filters { grid-template-columns: 1fr 1fr; } .filters input { grid-column: 1 / -1; } }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr 1fr; gap: 10px; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+  .card[hidden] { display: none; }
+  .card__img { position: relative; aspect-ratio: 1; display: grid; place-items: center; background: #fff; }
+  .card__img img { width: 100%; height: 100%; object-fit: contain; }
+  .card__icon { font-size: 3.5rem; }
+  .badge { position: absolute; top: 8px; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; color: #fff; }
+  .badge--off { left: 8px; background: var(--good); }
+  .badge--new { right: 8px; background: var(--brand); }
+  .card__body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .store { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--store); letter-spacing: 0.04em; }
+  .card__title { font-size: 0.95rem; margin: 0; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .price { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-top: auto; }
+  .price s { color: var(--muted); font-size: 0.85rem; }
+  .rating { font-size: 0.8rem; color: var(--muted); }
+  .btn { display: block; text-align: center; background: var(--store, var(--brand)); color: #fff; text-decoration: none; font-weight: 700; font-size: 0.9rem; padding: 9px 12px; border-radius: 8px; }
+  .empty { text-align: center; color: var(--muted); padding: 40px 0; }
+
+  .prose { max-width: 760px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px; }
+  .guide-list { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+  .ad { margin: 20px 0; min-height: 90px; }
+  .ad--placeholder { border: 2px dashed var(--line); display: grid; place-items: center; color: var(--muted); }
+
+  .footer { border-top: 1px solid var(--line); background: var(--card); padding: 20px 0; }
+  .footer__links { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.9rem; }
+</style>

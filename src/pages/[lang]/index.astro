@@ -1,0 +1,47 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProductGrid from '../../components/ProductGrid.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { SITE } from '../../site.config.mjs';
+import { UI } from '../../i18n/ui.mjs';
+import { products, categories, url, langPaths } from '../../lib/data.mjs';
+import { getGuides } from '../../lib/guides.mjs';
+export const getStaticPaths = langPaths;
+const { lang } = Astro.params;
+const t = UI[lang];
+const topDeals = [...products].sort((a, b) => (b.discount || 0) - (a.discount || 0)).slice(0, 8);
+const guides = getGuides(lang).slice(0, 3);
+---
+<Base lang={lang} path="/">
+  <section class="hero">
+    <h1>{SITE.tagline[lang]}</h1>
+    <p>Amazon · Flipkart · Myntra · Meesho · AJIO · Nykaa · Tata CLiQ · JioMart · Croma · FirstCry</p>
+    <a class="btn" href={url(`/${lang}/deals/`)}>{t.heroCta} →</a>
+  </section>
+
+  <h2>{t.categories}</h2>
+  <div class="tiles">
+    {categories.map((c) => (
+      <a class="tile" href={url(`/${lang}/category/${c.slug}/`)}>
+        <b>{c.icon}</b>{c.name[lang]}
+        <div class="small">{products.filter((p) => p.category === c.slug).length} {t.productsIn}</div>
+      </a>
+    ))}
+  </div>
+
+  <AdSlot />
+
+  <div class="section-head"><h2>{t.latest}</h2><a href={url(`/${lang}/deals/`)}>{t.viewAll} →</a></div>
+  <ProductGrid products={topDeals} lang={lang} filters={false} />
+
+  {guides.length > 0 && (
+    <>
+      <div class="section-head"><h2>{t.guides}</h2><a href={url(`/${lang}/guides/`)}>{t.viewAll} →</a></div>
+      <div class="guide-list">
+        {guides.map((g) => (
+          <a class="tile" href={url(`/${lang}/guides/${g.slug}/`)}><strong>{g.title}</strong><div class="small">{g.description}</div></a>
+        ))}
+      </div>
+    </>
+  )}
+</Base>

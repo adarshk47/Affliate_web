@@ -1,0 +1,14 @@
+---
+// Renders a Google AdSense unit once PUBLIC_ADSENSE_CLIENT is set.
+// Until then it renders nothing (or a dashed placeholder in `npm run dev`).
+interface Props { slot?: string; }
+const { slot = '' } = Astro.props;
+const client = import.meta.env.PUBLIC_ADSENSE_CLIENT;
+const dev = import.meta.env.DEV;
+---
+{client ? (
+  <div class="ad">
+    <ins class="adsbygoogle" style="display:block" data-ad-client={client} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script is:inline>(window.adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+) : dev ? <div class="ad ad--placeholder">Ad slot</div> : null}
